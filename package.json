@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite src",
     "build": "vite build src",
-    "preview": "vite preview src"
+    "server": "node backend/server.js"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.19",
